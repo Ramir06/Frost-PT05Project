@@ -1,0 +1,609 @@
+{% load static %}
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Frost — Холодные лакомства для теплых сердец. Мороженое ручной работы, джелато и замороженные десерты, приготовленные из местных ингредиентов.">
+  <meta name="keywords" content="мороженое, джелато, замороженные десерты, пекарня, кейтеринг, лакомства ручной работы">
+  <meta name="author" content="Frost Desserts">
+  <meta property="og:title" content="Frost — Холодные лакомства для теплых сердец">
+  <meta property="og:description" content="Мороженое ручной работы, джелато и замороженные десерты, приготовленные из местных ингредиентов.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Frost — Холодные лакомства для теплых сердец</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/templatemo-frost-style.css' %}">
+  <style>
+    /* Дополнительные стили для карточек с фото */
+    .flavor-card__swatch {
+      position: relative;
+      overflow: hidden;
+    }
+    .flavor-card__swatch img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .flavor-card__price {
+      margin-top: 0.75rem;
+      font-weight: 700;
+      color: var(--sage-dark);
+      font-size: 1.1rem;
+    }
+    .empty-message {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-light);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Открыть меню навигации" aria-expanded="false">
+    <div class="hamburger__lines">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </button>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Главная навигация">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo">Fr<span>o</span>st</div>
+      <div class="sidebar__tagline">Холодные лакомства для теплых сердец</div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <ul>
+        <li><a href="#hero" class="active"><span class="nav-icon">&#9678;</span> Главная</a></li>
+        <li><a href="#flavors"><span class="nav-icon">&#10047;</span> Вкусы</a></li>
+        <li><a href="#builder"><span class="nav-icon">&#9733;</span> Создай свой</a></li>
+        <li><a href="#catering"><span class="nav-icon">&#9738;</span> Кейтеринг</a></li>
+        <li><a href="#seasonal"><span class="nav-icon">&#10053;</span> Сезонное</a></li>
+        <li><a href="#loyalty"><span class="nav-icon">&#10084;</span> Лояльность</a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__hours">
+        <strong>Часы работы</strong><br>
+        Пн – Пт: 11:00 – 21:00<br>
+        Сб – Вс: 10:00 – 22:00
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="hero" id="hero">
+      <div class="hero__content">
+        <div class="hero__badge reveal">Сейчас в меню</div>
+        <h1 class="hero__title reveal reveal-delay-1">
+          Жизнь слишком коротка для<br><em>скучных десертов.</em>
+        </h1>
+        <p class="hero__subtitle reveal reveal-delay-2">
+          Мороженое и джелато ручной работы, которые мы готовим каждое утро из фермерского молока, сезонных фруктов с добавлением щепотки чего-то необычного.
+        </p>
+        <div class="hero__actions reveal reveal-delay-3">
+          <a href="#flavors" class="btn btn--primary">Смотреть вкусы</a>
+          <a href="#catering" class="btn btn--outline">Заказать тележку</a>
+        </div>
+      </div>
+
+      <div class="hero__deco" aria-hidden="true">
+        <div class="scoop scoop--strawberry">
+          <div class="scoop--highlight"></div>
+        </div>
+        <div class="scoop scoop--mint">
+          <div class="scoop--highlight"></div>
+        </div>
+        <div class="scoop scoop--vanilla">
+          <div class="scoop--highlight"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Секция вкусов с динамической загрузкой из БД -->
+    <section class="section section--alt flavors-section" id="flavors">
+      <div class="section__header reveal">
+        <span class="section__label">Палитра вкусов</span>
+        <h2 class="section__title">Выбери свой идеальный шарик</h2>
+        <p class="section__desc">От вечной классики до смелых экспериментов — каждый вкус начинается с уникального рецепта и настоящих цельных ингредиентов.</p>
+      </div>
+
+      <div class="marquee">
+        <!-- Первый ряд бегущей строки -->
+        <div class="marquee__track">
+          {% for ice_cream in marquee_ice_creams %}
+          <div class="flavor-card">
+            {% if ice_cream.is_popular %}
+            <div class="flavor-card__tag">Популярное</div>
+            {% elif ice_cream.is_new %}
+            <div class="flavor-card__tag">Новинка</div>
+            {% elif ice_cream.is_vegan %}
+            <div class="flavor-card__tag">Веганское</div>
+            {% elif ice_cream.is_seasonal %}
+            <div class="flavor-card__tag">Сезонное</div>
+            {% endif %}
+
+            <div class="flavor-card__swatch" style="background: radial-gradient(circle at 35% 35%, #fce4b8, #e6c68a); position: relative;">
+              {% if ice_cream.photo %}
+              <img src="{{ ice_cream.photo.url }}" alt="{{ ice_cream.title }}">
+              {% endif %}
+            </div>
+            <div class="flavor-card__info">
+              <span class="flavor-card__type">
+                {% if ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <h3 class="flavor-card__name">{{ ice_cream.title }}</h3>
+              <p class="flavor-card__desc">{{ ice_cream.description|truncatewords:20 }}</p>
+              <div class="flavor-card__price">{{ ice_cream.price }} ₽</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-message">🍦 Мороженое скоро появится в меню! 🍦</div>
+          {% endfor %}
+        </div>
+
+        <!-- Второй ряд бегущей строки (обратное направление) -->
+        <div class="marquee__track marquee__track--reverse">
+          {% for ice_cream in marquee_ice_creams_reverse %}
+          <div class="flavor-card">
+            {% if ice_cream.is_popular %}
+            <div class="flavor-card__tag">Популярное</div>
+            {% elif ice_cream.is_new %}
+            <div class="flavor-card__tag">Новинка</div>
+            {% elif ice_cream.is_vegan %}
+            <div class="flavor-card__tag">Веганское</div>
+            {% elif ice_cream.is_seasonal %}
+            <div class="flavor-card__tag">Сезонное</div>
+            {% endif %}
+
+            <div class="flavor-card__swatch" style="background: radial-gradient(circle at 35% 35%, #f4a4b8, #e07a8a); position: relative;">
+              {% if ice_cream.photo %}
+              <img src="{{ ice_cream.photo.url }}" alt="{{ ice_cream.title }}">
+              {% endif %}
+            </div>
+            <div class="flavor-card__info">
+              <span class="flavor-card__type">
+                {% if ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <h3 class="flavor-card__name">{{ ice_cream.title }}</h3>
+              <p class="flavor-card__desc">{{ ice_cream.description|truncatewords:20 }}</p>
+              <div class="flavor-card__price">{{ ice_cream.price }} ₽</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="section builder" id="builder">
+      <div class="section__header reveal">
+        <span class="section__label">Создай свой десерт</span>
+        <h2 class="section__title">Твой сандей, твои правила</h2>
+        <p class="section__desc">Пройди четыре шага создания идеального сандея на кассе или закажи заранее. Более 2000 возможных комбинаций.</p>
+      </div>
+
+      <div class="builder__layout">
+        <div class="builder__steps">
+          <div class="builder-step reveal">
+            <div class="builder-step__num">1</div>
+            <div>
+              <h3 class="builder-step__title">Выбери основу</h3>
+              <p class="builder-step__text">Мороженое, джелато, замороженный йогурт или безмолочный сорбет. Возьми один, два или все три сразу для идеальной порции.</p>
+            </div>
+          </div>
+
+          <div class="builder-step reveal reveal-delay-1">
+            <div class="builder-step__num">2</div>
+            <div>
+              <h3 class="builder-step__title">Выбери подачу</h3>
+              <p class="builder-step__text">Классический вафельный рожок, съедобная креманка ручной работы, стеклянная чаша или наш фирменный мега-рожок в шоколаде.</p>
+            </div>
+          </div>
+
+          <div class="builder-step reveal reveal-delay-2">
+            <div class="builder-step__num">3</div>
+            <div>
+              <h3 class="builder-step__title">Добавь топпинги</h3>
+              <p class="builder-step__text">Крошка Oreo, жареный кокос, карамелизованный пекан, свежие ягоды, кусочки брауни, моти и еще 20 других вариантов.</p>
+            </div>
+          </div>
+
+          <div class="builder-step reveal reveal-delay-3">
+            <div class="builder-step__num">4</div>
+            <div>
+              <h3 class="builder-step__title">Сиропы и украшения</h3>
+              <p class="builder-step__text">Горячий шоколад, карамельный соус, сироп матча, малиновый кули или мед — плюс щепотка морской соли или съедобные блестки.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder__preview reveal">
+          <div class="builder__preview-bowl">
+            <div class="builder__preview-scoop1"></div>
+            <div class="builder__preview-scoop2"></div>
+            <div class="builder__preview-scoop3"></div>
+          </div>
+          <p class="builder__preview-text">Собери свой сандей</p>
+          <p class="builder__preview-price">От 350 ₽</p>
+          <p class="builder__preview-note">Основа + 3 топпинга включены</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="catering">
+      <div class="section__header reveal">
+        <span class="section__label">Аренда тележки для кейтеринга</span>
+        <h2 class="section__title">Привезем сладости к вам</h2>
+        <p class="section__desc">Наши винтажные тележки полностью укомплектованы выбранными вами вкусами, дружелюбным мороженщиком и всеми топпингами, о которых только могут мечтать ваши гости.</p>
+      </div>
+
+      <div class="catering__grid">
+        <div class="cart-card reveal">
+          <div class="cart-card__visual">
+            <img src="{% static 'images/the-mini-scoop.avif' %}" alt="Тележка с мороженым для небольшой вечеринки" loading="lazy">
+            <span class="cart-card__visual-label">Камерная</span>
+          </div>
+          <div class="cart-card__body">
+            <h3 class="cart-card__name">Мини-тележка</h3>
+            <p class="cart-card__desc">Идеально подходит для дней рождения, бэби-шауэров и небольших офисных праздников. Компактная тележка, максимум вкуса.</p>
+            <div class="cart-card__details">
+              <span class="cart-card__detail">До 30 гостей</span>
+              <span class="cart-card__detail">3 вкуса</span>
+              <span class="cart-card__detail">2 часа</span>
+            </div>
+            <div class="cart-card__price">35 000 ₽ <small>/ мероприятие</small></div>
+          </div>
+        </div>
+
+        <div class="cart-card reveal reveal-delay-1">
+          <div class="cart-card__visual">
+            <img src="{% static 'images/the-classic-cart.avif' %}" alt="Винтажная тележка с мороженым на мероприятии на открытом воздухе" loading="lazy">
+            <span class="cart-card__visual-label">Самая популярная</span>
+          </div>
+          <div class="cart-card__body">
+            <h3 class="cart-card__name">Классическая тележка</h3>
+            <p class="cart-card__desc">Наша фирменная винтажная тележка. Идеальна для свадеб, корпоративных мероприятий и фестивалей на выходных.</p>
+            <div class="cart-card__details">
+              <span class="cart-card__detail">До 100 гостей</span>
+              <span class="cart-card__detail">6 вкусов</span>
+              <span class="cart-card__detail">3 часа</span>
+              <span class="cart-card__detail">Бар топпингов</span>
+            </div>
+            <div class="cart-card__price">75 000 ₽ <small>/ мероприятие</small></div>
+          </div>
+        </div>
+
+        <div class="cart-card reveal reveal-delay-2">
+          <div class="cart-card__visual">
+            <img src="{% static 'images/the-grand-parlor.avif' %}" alt="Элегантная подача десертов на премиальном мероприятии" loading="lazy">
+            <span class="cart-card__visual-label">Премиум</span>
+          </div>
+          <div class="cart-card__body">
+            <h3 class="cart-card__name">Гранд-парлор</h3>
+            <p class="cart-card__desc">Полное погружение — двойная станция с джелато, вафельным баром и выделенным координатором мероприятия.</p>
+            <div class="cart-card__details">
+              <span class="cart-card__detail">До 250 гостей</span>
+              <span class="cart-card__detail">10 вкусов</span>
+              <span class="cart-card__detail">4 часа</span>
+              <span class="cart-card__detail">Вафельный бар</span>
+              <span class="cart-card__detail">Координатор</span>
+            </div>
+            <div class="cart-card__price">140 000 ₽ <small>/ мероприятие</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Сезонные вкусы из БД -->
+    <section class="section" id="seasonal">
+      <div class="section__header reveal">
+        <span class="section__label">Лимитированная серия</span>
+        <h2 class="section__title">Сезонные вкусы, свежие и мимолетные</h2>
+        <p class="section__desc">Каждый сезон приносит новую линейку вкусов, вдохновленную тем, что созрело, витает в воздухе и вызывает легкую ностальгию.</p>
+      </div>
+
+      <div class="seasonal-tabs reveal" role="tablist">
+        <button class="seasonal-tab is-active" data-season="spring" role="tab" aria-selected="true" aria-controls="panel-spring">
+          <span class="seasonal-tab__icon" aria-hidden="true">&#127800;</span> Весна
+        </button>
+        <button class="seasonal-tab" data-season="summer" role="tab" aria-selected="false" aria-controls="panel-summer">
+          <span class="seasonal-tab__icon" aria-hidden="true">&#9728;</span> Лето
+        </button>
+        <button class="seasonal-tab" data-season="autumn" role="tab" aria-selected="false" aria-controls="panel-autumn">
+          <span class="seasonal-tab__icon" aria-hidden="true">&#127810;</span> Осень
+        </button>
+        <button class="seasonal-tab" data-season="winter" role="tab" aria-selected="false" aria-controls="panel-winter">
+          <span class="seasonal-tab__icon" aria-hidden="true">&#10052;</span> Зима
+        </button>
+      </div>
+
+      <div class="seasonal-panels reveal">
+        <!-- Весна -->
+        <div class="seasonal-panel is-active" id="panel-spring" role="tabpanel">
+          {% if spring_ice_cream %}
+          <div class="seasonal-panel__visual">
+            {% if spring_ice_cream.photo %}
+            <img src="{{ spring_ice_cream.photo.url }}" alt="{{ spring_ice_cream.title }}" loading="lazy">
+            {% else %}
+            <img src="{% static 'images/spring-collection.avif' %}" alt="Весеннее мороженое" loading="lazy">
+            {% endif %}
+            <span class="seasonal-panel__badge">Доступно с марта по май</span>
+          </div>
+          <div class="seasonal-panel__details">
+            <span class="seasonal-panel__season-label">Весенняя коллекция</span>
+            <h3 class="seasonal-panel__name">{{ spring_ice_cream.title }}</h3>
+            <p class="seasonal-panel__desc">{{ spring_ice_cream.description }}</p>
+            <div class="seasonal-panel__meta">
+              <span class="seasonal-panel__meta-tag">
+                <span>🍦</span>
+                {% if spring_ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif spring_ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <span class="seasonal-panel__meta-tag"><span>✨</span> {{ spring_ice_cream.price }} ₽</span>
+              {% if spring_ice_cream.is_seasonal %}
+              <span class="seasonal-panel__meta-tag"><span>🌸</span> Ограниченная серия</span>
+              {% endif %}
+            </div>
+            <a href="#hero" class="btn btn--primary seasonal-panel__cta">Попробовать сейчас</a>
+          </div>
+          {% else %}
+          <div class="empty-message">🌸 Весенний вкус скоро появится! 🌸</div>
+          {% endif %}
+        </div>
+
+        <!-- Лето -->
+        <div class="seasonal-panel" id="panel-summer" role="tabpanel">
+          {% if summer_ice_cream %}
+          <div class="seasonal-panel__visual">
+            {% if summer_ice_cream.photo %}
+            <img src="{{ summer_ice_cream.photo.url }}" alt="{{ summer_ice_cream.title }}" loading="lazy">
+            {% else %}
+            <img src="{% static 'images/summer-collection.avif' %}" alt="Летнее мороженое" loading="lazy">
+            {% endif %}
+            <span class="seasonal-panel__badge">Доступно с июня по август</span>
+          </div>
+          <div class="seasonal-panel__details">
+            <span class="seasonal-panel__season-label">Летняя коллекция</span>
+            <h3 class="seasonal-panel__name">{{ summer_ice_cream.title }}</h3>
+            <p class="seasonal-panel__desc">{{ summer_ice_cream.description }}</p>
+            <div class="seasonal-panel__meta">
+              <span class="seasonal-panel__meta-tag">
+                <span>🍦</span>
+                {% if summer_ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif summer_ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <span class="seasonal-panel__meta-tag"><span>✨</span> {{ summer_ice_cream.price }} ₽</span>
+            </div>
+            <a href="#hero" class="btn btn--primary seasonal-panel__cta">Попробовать сейчас</a>
+          </div>
+          {% else %}
+          <div class="empty-message">☀️ Летний вкус скоро появится! ☀️</div>
+          {% endif %}
+        </div>
+
+        <!-- Осень -->
+        <div class="seasonal-panel" id="panel-autumn" role="tabpanel">
+          {% if autumn_ice_cream %}
+          <div class="seasonal-panel__visual">
+            {% if autumn_ice_cream.photo %}
+            <img src="{{ autumn_ice_cream.photo.url }}" alt="{{ autumn_ice_cream.title }}" loading="lazy">
+            {% else %}
+            <img src="{% static 'images/autumn-collection.avif' %}" alt="Осеннее мороженое" loading="lazy">
+            {% endif %}
+            <span class="seasonal-panel__badge">Доступно с сентября по ноябрь</span>
+          </div>
+          <div class="seasonal-panel__details">
+            <span class="seasonal-panel__season-label">Осенняя коллекция</span>
+            <h3 class="seasonal-panel__name">{{ autumn_ice_cream.title }}</h3>
+            <p class="seasonal-panel__desc">{{ autumn_ice_cream.description }}</p>
+            <div class="seasonal-panel__meta">
+              <span class="seasonal-panel__meta-tag">
+                <span>🍦</span>
+                {% if autumn_ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif autumn_ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <span class="seasonal-panel__meta-tag"><span>✨</span> {{ autumn_ice_cream.price }} ₽</span>
+            </div>
+            <a href="#hero" class="btn btn--primary seasonal-panel__cta">Попробовать сейчас</a>
+          </div>
+          {% else %}
+          <div class="empty-message">🍂 Осенний вкус скоро появится! 🍂</div>
+          {% endif %}
+        </div>
+
+        <!-- Зима -->
+        <div class="seasonal-panel" id="panel-winter" role="tabpanel">
+          {% if winter_ice_cream %}
+          <div class="seasonal-panel__visual">
+            {% if winter_ice_cream.photo %}
+            <img src="{{ winter_ice_cream.photo.url }}" alt="{{ winter_ice_cream.title }}" loading="lazy">
+            {% else %}
+            <img src="{% static 'images/winter-collection.avif' %}" alt="Зимнее мороженое" loading="lazy">
+            {% endif %}
+            <span class="seasonal-panel__badge">Доступно с декабря по февраль</span>
+          </div>
+          <div class="seasonal-panel__details">
+            <span class="seasonal-panel__season-label">Зимняя коллекция</span>
+            <h3 class="seasonal-panel__name">{{ winter_ice_cream.title }}</h3>
+            <p class="seasonal-panel__desc">{{ winter_ice_cream.description }}</p>
+            <div class="seasonal-panel__meta">
+              <span class="seasonal-panel__meta-tag">
+                <span>🍦</span>
+                {% if winter_ice_cream.flavor_type == 'gelato' %}Джелато
+                {% elif winter_ice_cream.flavor_type == 'sorbet' %}Сорбет
+                {% else %}Мороженое
+                {% endif %}
+              </span>
+              <span class="seasonal-panel__meta-tag"><span>✨</span> {{ winter_ice_cream.price }} ₽</span>
+            </div>
+            <a href="#hero" class="btn btn--primary seasonal-panel__cta">Попробовать сейчас</a>
+          </div>
+          {% else %}
+          <div class="empty-message">❄️ Зимний вкус скоро появится! ❄️</div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt loyalty" id="loyalty">
+      <div class="section__header reveal">
+        <span class="section__label">Награды Frost</span>
+        <h2 class="section__title">Каждый шарик приближает к цели</h2>
+        <p class="section__desc">Возьмите карточку со штампами при следующем визите. Десять штампов дают право на бесплатный шарик, а также приятные бонусы по пути.</p>
+      </div>
+
+      <div class="loyalty__layout">
+        <div class="loyalty__info reveal">
+          <div class="loyalty__perks">
+            <div class="perk">
+              <div class="perk__icon">✓</div>
+              <p class="perk__text"><strong>5-й штамп:</strong> Бесплатный дополнительный топпинг к любому сандею или рожку — да, смело добавляйте кусочки брауни.</p>
+            </div>
+            <div class="perk">
+              <div class="perk__icon">✓</div>
+              <p class="perk__text"><strong>10-й штамп:</strong> Один бесплатный шарик любого вкуса, включая сезонные и лимитированные серии.</p>
+            </div>
+            <div class="perk">
+              <div class="perk__icon">✓</div>
+              <p class="perk__text"><strong>Бонус на день рождения:</strong> Покажите удостоверение личности в месяц вашего дня рождения и получите бесплатный вафельный рожок в течение всей недели.</p>
+            </div>
+            <div class="perk">
+              <div class="perk__icon">✓</div>
+              <p class="perk__text"><strong>Награда за приглашение:</strong> Приведите друга, который тоже начнет собирать штампы, и вы оба получите по бонусному штампу.</p>
+            </div>
+          </div>
+
+          <a href="#hero" class="btn btn--sage" style="margin-top: 2rem;">Начать копить</a>
+        </div>
+
+        <div class="stamp-card reveal reveal-delay-1">
+          <div class="stamp-card__header">
+            <span class="stamp-card__title">Ваша карта</span>
+            <span class="stamp-card__count">7 / 10</span>
+          </div>
+          <div class="stamp-card__grid">
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp stamp--reward stamp--filled">⭐</div>
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp stamp--filled">🍦</div>
+            <div class="stamp">🍦</div>
+            <div class="stamp">🍦</div>
+            <div class="stamp stamp--reward">FREE</div>
+          </div>
+          <p class="stamp-card__footer">Осталось 3 шарика до бесплатного угощения!</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer__top">
+        <div>
+          <div class="footer__brand">Fr<span>o</span>st</div>
+          <p class="footer__copy">Мороженое и джелато ручной работы, которые мы готовим каждый день на нашей кухне. Сделано с любовью, подается с улыбкой.</p>
+        </div>
+
+        <div class="footer__links">
+          <div class="footer__col">
+            <h4>Меню</h4>
+            <ul>
+              <li><a href="#flavors">Вкусы</a></li>
+              <li><a href="#builder">Создай свой</a></li>
+              <li><a href="#seasonal">Сезонные вкусы</a></li>
+              <li><a href="#catering">Кейтеринг</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>Компания</h4>
+            <ul>
+              <li><a href="#">Наша история</a></li>
+              <li><a href="#">Поставщики</a></li>
+              <li><a href="#">Вакансии</a></li>
+              <li><a href="#">Пресса</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>Связь</h4>
+            <ul>
+              <li><a href="#">Twitter</a></li>
+              <li><a href="#">Facebook</a></li>
+              <li><a href="#">Instagram</a></li>
+              <li><a href="#">hello@frost.com</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p>&copy; 2026 Frost Desserts. Все права защищены.</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="{% static 'js/templatemo-frost-script.js' %}"></script>
+  <script>
+    // Дублирование карточек для бесшовной прокрутки
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.marquee__track').forEach(function(track) {
+        var cards = track.querySelectorAll('.flavor-card');
+        if (cards.length === 0) return;
+        cards.forEach(function(card) {
+          track.appendChild(card.cloneNode(true));
+        });
+      });
+    });
+
+    // JavaScript для переключения сезонных вкладок
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.seasonal-tab');
+      const panels = document.querySelectorAll('.seasonal-panel');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const season = this.dataset.season;
+
+          // Убираем активный класс у всех вкладок и панелей
+          tabs.forEach(t => t.classList.remove('is-active'));
+          panels.forEach(p => p.classList.remove('is-active'));
+
+          // Добавляем активный класс текущей вкладке
+          this.classList.add('is-active');
+
+          // Показываем соответствующую панель
+          const activePanel = document.getElementById(`panel-${season}`);
+          if (activePanel) {
+            activePanel.classList.add('is-active');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
